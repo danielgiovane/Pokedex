@@ -1,12 +1,24 @@
 let card = document.querySelector('.card');
+const arrPokemons = [];
 
-async function load(url) {
-  let response = await fetch(url);
-  let data = await response.json();
-  return data;
+const getUrlPokemon = (id) => ` https://pokeapi.co/api/v2/pokemon/${id} `;
+
+for (let i = 1; i <= 150; i++) {
+  arrPokemons.push(fetch(getUrlPokemon(i)).then(handleData))
 }
 
-let dados = load('https://pokeapi.co/api/v2/pokemon?limit=200&offset=0');
+Promise.all(arrPokemons).then(pokemons => console.log(pokemons))
+// async function load(url) {
+//   let response = await fetch(url);
+//   let dados = await handleData(response);
+//   return dados;
+// }
+
+function handleData(res) {
+ return res.ok ? res.json() : Promise.reject(statusText);
+}
+
+let dados = load(URL);
 
 dados.then((data) => {
   for (let i in data.results) {
@@ -15,6 +27,7 @@ dados.then((data) => {
   }
 });
 
+
 function filterName(name) {
   let newName = name[0].toUpperCase() + name.slice(1);
   return newName;
@@ -22,42 +35,37 @@ function filterName(name) {
 
 async function template(dadosPokemons) {
   let dadosUrl = await load(dadosPokemons.url);
+  dadosImage.currentImage = dadosUrl.sprites.front_default;
+
   card.innerHTML +=
-   `<div class="card1">
-      <img src="${dadosUrl.sprites.front_default}"></img>
+    `<div class="card1">
+      <img src="${dadosImage.currentImage}"></img>
        <div class="container">
           <h3>${filterName(dadosPokemons.name)}</h3>
           <p> tipo: ${dadosUrl.types.map(type => type.type.name)}</p>
       </div>
    </div>`
+  criandoEvento('.card1', dadosUrl)
 }
 
-// const dadosImage = {
-//   isFront: true,
-//   currentImg: ''
-// }
 
-// let card1 = document.querySelector('.card1');
-// card1.addEventListener('click', function(){
-//   mudarSprite(dadosPokemons);
-// })
-// function mudarSprite(dadosPokemons){
-//   if(dadosImage.isFront){
-//     dadosImage.isFront = false;
-//     dadosImage.currentImg = dadosPokemons.sprites.back_default;
-//   }else {
-//     dadosImage.isFront = true;
-//     dadosImage.currentImg = dadosPokemons.sprites.front_default;
-//   }
-// }
+function criandoEvento(seletor, dadosUrl) {
+  let card1 = document.querySelectorAll(seletor);
+  card1.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      mudarSprite(e, dadosUrl)
+    })
+  })
+}
+
+const dadosImage = {
+  isFront: true,
+  currentImage: ''
+}
 
 
-// ${async function () {
-//   let url = await handleDados(dadosPokemons.url);
-//   let dadosUrl = new Object();
-//   dadosUrl.urlTypes = url.types;
-//   dadosUrl.backDefault = url.sprites.back_default;
-//   dadosUrl.FrontDefault = url.sprites.front_default;
-//   console.log(dadosUrl.FrontDefault)
-// }()
-//   }
+function mudarSprite(e, dadosUrl) {
+  console.log('Event: ', e.target.src)
+  console.log('DadosURL: ', dadosUrl.sprites.front_default);
+
+}
