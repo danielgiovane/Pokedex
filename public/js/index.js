@@ -1,83 +1,41 @@
 let card = document.querySelector('.card');
-const arrPokemons = [];
 
 const getUrlPokemon = (id) => ` https://pokeapi.co/api/v2/pokemon/${id} `;
 
-for (let i = 1; i <= 150; i++) {
-  arrPokemons.push(fetch(getUrlPokemon(i)).then(handleData))
-}
+const generatePokemonPromises = () => Array(201).fill().map((item, index) =>
+  fetch(getUrlPokemon(index + 1)).then(handleDataPokemon)
+);
 
-Promise.all(arrPokemons).then(pokemons => {
-  console.log(template(pokemons))
-})
+const fetchPokemon = () => {
+  const arrPokemons = generatePokemonPromises();
+  Promise.all(arrPokemons)
+    .then(pokemons => {
+      card.innerHTML = template(pokemons)
+    })
+};
 
-function handleData(res) {
+fetchPokemon();
+
+
+function handleDataPokemon(res) {
   return res.ok ? res.json() : Promise.reject(statusText);
-}
-
-
-// let dados = load(URL);
-
-// dados.then((data) => {
-//   for (let i in data.results) {
-//     let dadosPokemons = data.results[i];
-//     template(dadosPokemons);
-//   }
-// });
-
+};
 
 function filterName(name) {
   let newName = name[0].toUpperCase() + name.slice(1);
   return newName;
-}
+};
 
 const template = (pokemons) => {
   return pokemons.reduce((acc, pokemon) => {
     const elTypes = pokemon.types.map(typeInfo => typeInfo.type.name)
     return acc +=
-      ` <div class="card1">
-          <img class="card-image ${elTypes[0]}" alt="${pokemon.name}"src="https://pokeres.bastionbot.org/images/pokemon/${pokemon.id}.png"/>
+      ` <div class="card1 ${elTypes[0]}">
+          <img class="card-image " alt="${pokemon.name}"src="https://pokeres.bastionbot.org/images/pokemon/${pokemon.id}.png"/>
           <div class="container">
-            <h3>${filterName(pokemon.name)}</h3>
-            <p> tipo: ${elTypes.join(' | ')}</p>
+            <h3 class="nome">${filterName(pokemon.name)}</h3>
+            <p class="info">Tipo: ${elTypes.join(' | ')}</p>
           </div>
         </div>`
-  }, '')
-}
-
-// async function template(dadosPokemons) {
-//   let dadosUrl = await load(dadosPokemons.url);
-//   dadosImage.currentImage = dadosUrl.sprites.front_default;
-
-//   card.innerHTML +=
-//     `<div class="card1">
-//       <img src="${dadosImage.currentImage}"></img>
-//        <div class="container">
-//           <h3>${filterName(dadosPokemons.name)}</h3>
-//           <p> tipo: ${dadosUrl.types.map(type => type.type.name)}</p>
-//       </div>
-//    </div>`
-//   criandoEvento('.card1', dadosUrl)
-// }
-
-
-function criandoEvento(seletor, dadosUrl) {
-  let card1 = document.querySelectorAll(seletor);
-  card1.forEach((card) => {
-    card.addEventListener('click', (e) => {
-      mudarSprite(e, dadosUrl)
-    })
-  })
-}
-
-const dadosImage = {
-  isFront: true,
-  currentImage: ''
-}
-
-
-function mudarSprite(e, dadosUrl) {
-  console.log('Event: ', e.target.src)
-  console.log('DadosURL: ', dadosUrl.sprites.front_default);
-
-}
+  }, '');
+};
