@@ -7,25 +7,23 @@ for (let i = 1; i <= 150; i++) {
   arrPokemons.push(fetch(getUrlPokemon(i)).then(handleData))
 }
 
-Promise.all(arrPokemons).then(pokemons => console.log(pokemons))
-// async function load(url) {
-//   let response = await fetch(url);
-//   let dados = await handleData(response);
-//   return dados;
-// }
+Promise.all(arrPokemons).then(pokemons => {
+    template(pokemons)
+})
 
 function handleData(res) {
- return res.ok ? res.json() : Promise.reject(statusText);
+  return res.ok ? res.json() : Promise.reject(statusText);
 }
 
-let dados = load(URL);
 
-dados.then((data) => {
-  for (let i in data.results) {
-    let dadosPokemons = data.results[i];
-    template(dadosPokemons);
-  }
-});
+// let dados = load(URL);
+
+// dados.then((data) => {
+//   for (let i in data.results) {
+//     let dadosPokemons = data.results[i];
+//     template(dadosPokemons);
+//   }
+// });
 
 
 function filterName(name) {
@@ -33,20 +31,33 @@ function filterName(name) {
   return newName;
 }
 
-async function template(dadosPokemons) {
-  let dadosUrl = await load(dadosPokemons.url);
-  dadosImage.currentImage = dadosUrl.sprites.front_default;
-
-  card.innerHTML +=
-    `<div class="card1">
-      <img src="${dadosImage.currentImage}"></img>
-       <div class="container">
-          <h3>${filterName(dadosPokemons.name)}</h3>
-          <p> tipo: ${dadosUrl.types.map(type => type.type.name)}</p>
-      </div>
-   </div>`
-  criandoEvento('.card1', dadosUrl)
+const template = (pokemons) => {
+  return pokemons.reduce((acc, pokemon) => {
+      acc += 
+      ` <div class="card1">
+          <img src="${pokemon.sprites}"></img>  
+          <div class="container">
+            <h3>${filterName(pokemon.name)}</h3>
+            <p> tipo: ${pokemon.types.map(type => console.log(type.type))}</p>
+          </div>
+        </div>`
+  }, '')
 }
+
+// async function template(dadosPokemons) {
+//   let dadosUrl = await load(dadosPokemons.url);
+//   dadosImage.currentImage = dadosUrl.sprites.front_default;
+
+//   card.innerHTML +=
+//     `<div class="card1">
+//       <img src="${dadosImage.currentImage}"></img>
+//        <div class="container">
+//           <h3>${filterName(dadosPokemons.name)}</h3>
+//           <p> tipo: ${dadosUrl.types.map(type => type.type.name)}</p>
+//       </div>
+//    </div>`
+//   criandoEvento('.card1', dadosUrl)
+// }
 
 
 function criandoEvento(seletor, dadosUrl) {
