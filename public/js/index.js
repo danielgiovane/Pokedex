@@ -8,7 +8,7 @@ for (let i = 1; i <= 150; i++) {
 }
 
 Promise.all(arrPokemons).then(pokemons => {
-    template(pokemons)
+  console.log(template(pokemons))
 })
 
 function handleData(res) {
@@ -33,12 +33,13 @@ function filterName(name) {
 
 const template = (pokemons) => {
   return pokemons.reduce((acc, pokemon) => {
-      acc += 
+    const elTypes = pokemon.types.map(typeInfo => typeInfo.type.name)
+    return acc +=
       ` <div class="card1">
-          <img src="${pokemon.sprites}"></img>  
+          <img class="card-image ${elTypes[0]}" alt="${pokemon.name}"src="https://pokeres.bastionbot.org/images/pokemon/${pokemon.id}.png"/>
           <div class="container">
             <h3>${filterName(pokemon.name)}</h3>
-            <p> tipo: ${pokemon.types.map(type => console.log(type.type))}</p>
+            <p> tipo: ${elTypes.join(' | ')}</p>
           </div>
         </div>`
   }, '')
